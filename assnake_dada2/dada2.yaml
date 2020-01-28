@@ -1,0 +1,7 @@
+channels:
+  - r
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconductor-dada2
