@@ -14,7 +14,7 @@ def get_params_str(params_loc):
     return params_str
 
 params_str = get_params_str(snakemake.input.params)
-filter_trim_script = os.path.join(snakemake.config['assnake_install_dir'], 'modules/dada2/scripts/filter_trim.R')
+filter_trim_script = os.path.join(snakemake.config['assnake-dada2'], 'scripts/filter_trim.R')
 shell('''export LANG=en_US.UTF-8;\nexport LC_ALL=en_US.UTF-8;\n
                     Rscript {filter_trim_script} '{snakemake.input.r1}' '{snakemake.input.r2}' '{snakemake.output.r1}' '{snakemake.output.r2}' {params_str} >{snakemake.log} 2>&1''')
 

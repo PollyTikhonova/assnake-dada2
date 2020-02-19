@@ -1,0 +1,9 @@
+truncLen_f: 247
+truncLen_r: 245
+trimLeft_l: 3
+trimLeft_r: 3
+maxN: 0
+maxEE_f: 2 
+maxEE_r: 2
+truncQ: 2
+rm_phix: 'TRUE'
