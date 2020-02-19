@@ -1,7 +1,9 @@
 channels:
-  - r
   - conda-forge
   - bioconda
+  - r
   - defaults
 dependencies:
   - bioconductor-dada2
+  - r-matrix=1.2_18
+  - icu
