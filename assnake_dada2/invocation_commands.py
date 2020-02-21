@@ -64,6 +64,11 @@ def filter_and_trim_invocation(config, df, preproc, samples_to_add, params):
 
 @click.pass_obj
 def dada2_full(config, df, preproc, samples_to_add, learn_errors_params, min_overlap):
+    # check if database initialized
+    if config['config'].get('dada2-silva_nr_v132', None) is None:
+        click.secho('Silva database not initialized!', fg='red')
+        click.echo('run ' + click.style('assnake init dada2-silva-db', bg='blue') + ' and follow instructions')
+        exit()
     samples_to_add = [] if samples_to_add == '' else [c.strip() for c in samples_to_add.split(',')]
     df = assnake.api.loaders.load_df_from_db(df)
     config['requested_dfs'] += [df['df']]

@@ -3,6 +3,7 @@ from assnake.api.snake_module import SnakeModule
 from assnake.utils import read_yaml
 
 from assnake_dada2.invocation_commands import filter_and_trim_invocation, dada2_full
+from assnake_dada2.init_dada2 import dada2_init
 
 
 
@@ -11,5 +12,5 @@ snake_module = SnakeModule(name = 'assnake-dada2',
                            install_dir = this_dir,
                            snakefiles = ['./dada2.py'],
                            invocation_commands = [filter_and_trim_invocation, dada2_full],
-                        #    initialization_commands = [init_remove_human_bbmap],
+                           initialization_commands = [dada2_init],
                            wc_configs = [read_yaml(os.path.join(this_dir, './wc_config.yaml'))])
