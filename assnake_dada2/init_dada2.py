@@ -1,5 +1,5 @@
 import assnake.api.loaders
-import assnake.api.sample_set
+import assnake
 from tabulate import tabulate
 import click, glob, os
 from assnake.utils import download_from_url, update_config, load_config_file
