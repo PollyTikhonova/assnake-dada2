@@ -18,8 +18,8 @@ derepR <- derepFastq(r2)
 derepNum <- length(derepF$map)
 
 # CORE ALGORITHM
-ddF <- dada(derepF, err=errF, multithread=TRUE)
-ddR <- dada(derepR, err=errR, multithread=TRUE)
+ddF <- dada(derepF, err=errF, multithread=24)
+ddR <- dada(derepR, err=errR, multithread=24)
 
 # MERGE back
 merger <- mergePairs(ddF, derepF, ddR, derepR, minOverlap=minOverlap)

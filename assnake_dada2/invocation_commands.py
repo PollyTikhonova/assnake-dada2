@@ -2,7 +2,8 @@ import assnake.api.loaders
 import assnake
 from tabulate import tabulate
 import click
-from assnake.cli.cli_utils import sample_set_construction_options, add_options, generic_command_individual_samples, generate_result_list
+from assnake.core.sample_set import generic_command_individual_samples, generate_result_list
+from assnake.cli.cli_utils import sample_set_construction_options, add_options
 import os, datetime 
 import pandas as pd
 
@@ -12,7 +13,7 @@ import pandas as pd
 @click.pass_obj
 
 def filter_and_trim_invocation(config, result = 'dada2-filter-and-trim', **kwargs): 
-    wc_str = '{fs_prefix}/{df}/reads/{preproc}__dada2fat_{params}/{sample}_R1.fastq.gz'
+    wc_str = '{fs_prefix}/{df}/reads/{preproc}__dada2fat_{params}/{df_sample}_R1.fastq.gz'
     sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
     config['requests'] += generate_result_list(sample_set, wc_str, **kwargs)
     
@@ -47,15 +48,15 @@ def dada2_full(config, sample_set_name, learn_errors_params, min_overlap, **kwar
     sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
 
     # Prepare sample set file
-    res_list = prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, learn_errors_params = learn_errors_params, min_overlap = min_overlap)
+    res_list = prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params, min_overlap = min_overlap)
 
     config['requests'] += res_list
 
-def prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, **kwargs):
+def prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_config,  **kwargs):
 
-    dfs = list(set(sample_set.samples_pd['df']))
+    dfs = list(set(sample_set['df']))
     if len(dfs) == 1:
-        fs_prefix = list(set(sample_set.samples_pd['fs_prefix']))[0]
+        fs_prefix = list(set(sample_set['fs_prefix']))[0]
 
     dada2_set_dir_wc = '{fs_prefix}/{df}/dada2/{sample_set_name}'
     dada2_set_dir = '{fs_prefix}/{df}/dada2/{sample_set_name}/'.format(fs_prefix = fs_prefix, df = dfs[0], sample_set_name = sample_set_name)
@@ -70,10 +71,11 @@ def prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, **kwargs
     # print(dada2_set_dir_wc.format( **{key:value for key,value in kwargs.items() if key in field_names} ))
 
     dada2_dicts = []
-    for s in sample_set.samples_pd.to_dict(orient='records'):
-        dada2_dicts.append(dict(mg_sample=s['fs_name'],
-        R1 = sample_set.wc_config['fastq_gz_file_wc'].format(fs_prefix=s['fs_prefix'], df=s['df'], preproc=s['preproc'], sample = s['fs_name'], strand = 'R1'), 
-        R2 = sample_set.wc_config['fastq_gz_file_wc'].format(fs_prefix=s['fs_prefix'], df=s['df'], preproc=s['preproc'], sample = s['fs_name'], strand = 'R2'),
+    for s in sample_set.to_dict(orient='records'):
+        print(s)
+        dada2_dicts.append(dict(mg_sample=s['df_sample'],
+        R1 = wc_config['fastq_gz_file_wc'].format(fs_prefix=s['fs_prefix'], df=s['df'], preproc=s['preproc'], df_sample = s['df_sample'], strand = 'R1'), 
+        R2 = wc_config['fastq_gz_file_wc'].format(fs_prefix=s['fs_prefix'], df=s['df'], preproc=s['preproc'], df_sample = s['df_sample'], strand = 'R2'),
         # merged = sample_set.wc_config['dada2_merged_wc'].format(prefix=s['fs_prefix'], df=s['df'], preproc=s['preproc'], sample = s['fs_name'], sample_set = set_name)
         ))
     if not os.path.exists(dada2_set_dir):

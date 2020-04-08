@@ -21,6 +21,7 @@ rule dada2_learn_errors:
     output:
         err          = '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{params}/err{strand}.rds'
     log:               '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{params}/err{strand}.log'
+    threads: 24
     conda: 'dada2.yaml'
     wrapper: "file://" + os.path.join(config['assnake-dada2'], 'learn_errors_wrapper.py')
 
@@ -32,6 +33,7 @@ rule dada2_derep_infer_pooled:
     output:
         infered      = '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{params}/dada{strand}.rds',
         derep        = '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{params}/derep{strand}.rds',
+    threads: 24
     conda: 'dada2.yaml'
     wrapper: "file://" + os.path.join(config['assnake-dada2'], 'infer_pooled_wrapper.py') 
 
@@ -48,6 +50,7 @@ rule dada2_merge_pooled:
         sample_set="[\w\d_-]+",
         err_params="[\w\d_-]+",
         # min_overlap="^[0-9]+$"
+    threads:24
     conda: 'dada2.yaml'
     shell: ('''export LANG=en_US.UTF-8;\nexport LC_ALL=en_US.UTF-8;\n
         Rscript {merge_pooled_script} '{input.derep_1}' '{input.derep_2}'  '{input.dada_1}' '{input.dada_2}' '{output.mergers}';''') 
@@ -75,6 +78,7 @@ rule dada2_nochim:
         sample_set="[\w\d_-]+",
         err_params="[\w\d_-]+",
         # min_overlap=" ^[0-9]+$"
+    threads: 24
     shell: ('''export LANG=en_US.UTF-8;\nexport LC_ALL=en_US.UTF-8;\n
         Rscript {seqtab_nochim_script} '{input}' '{output}';''') 
 
@@ -84,7 +88,7 @@ db_silva_nr_v132 = config.get('dada2-silva_nr_v132', None)
 rule dada2_assign_taxa:
     input: '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{err_params}/seqtab_nochim__{min_overlap}.rds'
     output: '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{err_params}/taxa_{min_overlap}.rds'
-    threads: 12
+    threads: 24
     conda: 'dada2.yaml'
     shell: ("Rscript {assign_taxa_script} '{input}' '{output}' '{db_silva_nr_v132}' {threads}")
 
