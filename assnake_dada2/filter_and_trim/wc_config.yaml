@@ -1,0 +1,1 @@
+dada2-filter-and-trim_wc: '{fs_prefix}/{df}/reads/{preproc}__dada2fat_{preset}/{df_sample}_R1.fastq.gz'

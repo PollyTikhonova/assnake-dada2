@@ -10,4 +10,4 @@ rule dada2_filter_and_trim:
     wildcard_constraints:    
         df="[\w\d_-]+"
     conda: '../dada2.yaml'
-    wrapper: "file://" + os.path.join(config['assnake-dada2'], 'filter_and_trim/wrapper.py')
+    wrapper: "file://" + os.path.join(config['assnake-dada2']['install_dir'], 'filter_and_trim/wrapper.py')
