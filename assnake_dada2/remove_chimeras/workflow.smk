@@ -1,4 +1,4 @@
-seqtab_nochim_script = os.path.join(config['assnake-dada2'], 'scripts/seqtab_nochim.R')
+seqtab_nochim_script = os.path.join(config['assnake-dada2']['install_dir'], 'remove_chimeras/seqtab_nochim.R')
 rule dada2_nochim:
     input:  '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{err_params}/seqtab__{min_overlap}.rds'
     output: '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{err_params}/seqtab_nochim__{min_overlap}.rds'

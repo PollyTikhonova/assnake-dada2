@@ -1,4 +1,4 @@
-merge_pooled_script = os.path.join(config['assnake-dada2'], 'scripts/merge_pooled.R')
+merge_pooled_script = os.path.join(config['assnake-dada2']['install_dir'], 'merge/merge_pooled.R')
 rule dada2_merge_pooled:
     input: 
         dada_1  = '{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{params}/dadaR1.rds',
