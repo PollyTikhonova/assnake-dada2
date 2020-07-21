@@ -3,12 +3,10 @@ import assnake
 from tabulate import tabulate
 import click
 from assnake.core.sample_set import generic_command_individual_samples, generate_result_list
-from assnake.cli.cli_utils import sample_set_construction_options, add_options
+from assnake.core.command_builder import sample_set_construction_options, add_options
 import os, datetime 
 import pandas as pd
-
-
-    
+from assnake.core.result import Result
 
 
 @click.command('dada2-full', short_help='Execute full dada2 pipeline')
@@ -39,6 +37,13 @@ def dada2_full(config, sample_set_name, learn_errors_params, min_overlap, **kwar
     # load sample set     
     sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
 
+    learn_errors_result = Result.get_result_by_name('dada2-learn-errors')
+    learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
+    if learn_errors_preset is not None:
+        learn_errors_params = learn_errors_preset['full_name']
+    else:
+        click.secho('NO SUCH PRESET', fg='red')
+        exit()
     # Prepare sample set file
     res_list = prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params, min_overlap = min_overlap)
 

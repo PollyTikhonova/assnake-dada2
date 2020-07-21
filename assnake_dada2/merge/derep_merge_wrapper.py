@@ -13,7 +13,7 @@ def get_params_str(params_loc):
     return params_str
 
 params_str = get_params_str(snakemake.input.params)
-derep_dada_merge_script = os.path.join(snakemake.config['assnake-dada2'], 'scripts/derep_dada_merge.R')
+derep_dada_merge_script = os.path.join(snakemake.config['assnake-dada2']['install_dir'], 'scripts/derep_dada_merge.R')
 shell('''export LANG=en_US.UTF-8;\nexport LC_ALL=en_US.UTF-8;\n
                     Rscript  {derep_dada_merge_script} '{snakemake.input.r1}' '{snakemake.input.r2}'\
                          '{snakemake.input.errF}' '{snakemake.input.errR}' '{snakemake.output.merged}'\
