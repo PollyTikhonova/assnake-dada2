@@ -32,10 +32,11 @@ def dada2_full(config, sample_set_name, learn_errors_params, min_overlap, **kwar
         click.secho('Silva database not initialized!', fg='red')
         click.echo('run ' + click.style('assnake init dada2-silva-db', bg='blue') + ' and follow instructions')
         exit()
-    print(kwargs)
 
     # load sample set     
-    sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
+    sample_set, sample_set_name_gen = generic_command_individual_samples(config,  **kwargs)
+    if sample_set_name == '':
+        sample_set_name = sample_set_name_gen
 
     learn_errors_result = Result.get_result_by_name('dada2-learn-errors')
     learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
@@ -82,7 +83,7 @@ def prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_confi
     if not os.path.isfile(os.path.join(dada2_set_dir, 'samples.tsv')):
         dada2_df.to_csv(os.path.join(dada2_set_dir, 'samples.tsv'), sep='\t', index=False)
 
-    res_list = ['{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{learn_errors_params}/taxa_{min_overlap}.rds'.format(
+    res_list = ['{fs_prefix}/{df}/dada2/{sample_set}/learn_erros__{learn_errors_params}/seqtab_nochim__{min_overlap}.reads_count.tsv'.format(
         fs_prefix = fs_prefix,
         df = dfs[0],
         sample_set = sample_set_name,
