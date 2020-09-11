@@ -4,6 +4,7 @@ from tabulate import tabulate
 import click
 from assnake.core.sample_set import generic_command_individual_samples, generate_result_list
 from assnake.core.command_builder import sample_set_construction_options, add_options
+from assnake.core.dataset import Dataset
 import os, datetime 
 import pandas as pd
 from assnake.core.result import Result
@@ -36,16 +37,26 @@ def dada2_full(config, sample_set_name, learn_errors_params, min_overlap, **kwar
 
     # load sample set     
     sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
-
-    learn_errors_result = Result.get_result_by_name('dada2-learn-errors')
-    learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
-    if learn_errors_preset is not None:
-        learn_errors_params = learn_errors_preset['full_name']
+    if Dataset(list(set(sample_set['df']))[0]).dataset_type == 'paired-end':
+        learn_errors_result = Result.get_result_by_name('dada2-learn-errors')
+        learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
+        if learn_errors_preset is not None:
+            learn_errors_params = learn_errors_preset['full_name']
+        else:
+            click.secho('NO SUCH PRESET', fg='red')
+            exit()
+        # Prepare sample set file
+        res_list = prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params, min_overlap = min_overlap)
     else:
-        click.secho('NO SUCH PRESET', fg='red')
-        exit()
-    # Prepare sample set file
-    res_list = prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params, min_overlap = min_overlap)
+        learn_errors_result = Result.get_result_by_name('dada2-learn-errors-single')
+        learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
+        if learn_errors_preset is not None:
+            learn_errors_params = learn_errors_preset['full_name']
+        else:
+            click.secho('NO SUCH PRESET', fg='red')
+            exit()
+        # Prepare sample set file
+        res_list = prepare_sample_set_tsv_and_get_results_single(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params)
 
     config['requests'] += res_list
 
@@ -94,41 +105,41 @@ def prepare_sample_set_tsv_and_get_results(sample_set, sample_set_name, wc_confi
 
 
 
-@click.command('dada2-full-single', short_help='Execute full dada2 pipeline for single-end reads')
-@add_options(sample_set_construction_options)
-@click.option('--sample-set-name', 
-                help='Name of your sample set', 
-                default='',
-                type=click.STRING )
-@click.option('--learn-errors-params', 
-                help='Parameters for learn errors', 
-                default='def',
-                type=click.STRING )
+# @click.command('dada2-full-single', short_help='Execute full dada2 pipeline for single-end reads')
+# @add_options(sample_set_construction_options)
+# @click.option('--sample-set-name', 
+#                 help='Name of your sample set', 
+#                 default='',
+#                 type=click.STRING )
+# @click.option('--learn-errors-params', 
+#                 help='Parameters for learn errors', 
+#                 default='def',
+#                 type=click.STRING )
 
-@click.pass_obj
-def dada2_full_single(config, sample_set_name, learn_errors_params, **kwargs):
+# @click.pass_obj
+# def dada2_full_single(config, sample_set_name, learn_errors_params, **kwargs):
 
-    # check if database initialized
-    if config['config'].get('dada2-silva_nr_v132', None) is None:
-        click.secho('Silva database not initialized!', fg='red')
-        click.echo('run ' + click.style('assnake init dada2-silva-db', bg='blue') + ' and follow instructions')
-        exit()
-    print(kwargs)
+#     # check if database initialized
+#     if config['config'].get('dada2-silva_nr_v132', None) is None:
+#         click.secho('Silva database not initialized!', fg='red')
+#         click.echo('run ' + click.style('assnake init dada2-silva-db', bg='blue') + ' and follow instructions')
+#         exit()
+#     print(kwargs)
 
-    # load sample set     
-    sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
+#     # load sample set     
+#     sample_set, sample_set_name = generic_command_individual_samples(config,  **kwargs)
 
-    learn_errors_result = Result.get_result_by_name('dada2-learn-errors-single')
-    learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
-    if learn_errors_preset is not None:
-        learn_errors_params = learn_errors_preset['full_name']
-    else:
-        click.secho('NO SUCH PRESET', fg='red')
-        exit()
-    # Prepare sample set file
-    res_list = prepare_sample_set_tsv_and_get_results_single(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params)
+#     learn_errors_result = Result.get_result_by_name('dada2-learn-errors-single')
+#     learn_errors_preset = learn_errors_result.preset_manager.find_preset_by_name(learn_errors_params)
+#     if learn_errors_preset is not None:
+#         learn_errors_params = learn_errors_preset['full_name']
+#     else:
+#         click.secho('NO SUCH PRESET', fg='red')
+#         exit()
+#     # Prepare sample set file
+#     res_list = prepare_sample_set_tsv_and_get_results_single(sample_set, sample_set_name, wc_config = config['wc_config'], learn_errors_params = learn_errors_params)
 
-    config['requests'] += res_list
+#     config['requests'] += res_list
 
 def prepare_sample_set_tsv_and_get_results_single(sample_set, sample_set_name, wc_config,  **kwargs):
 

@@ -16,6 +16,6 @@ snake_module = assnake.SnakeModule(name = 'assnake-dada2',
                                './make_seqtab_single/workflow.smk',
                                './dada/workflow.smk',
                            ],
-                           invocation_commands = [dada2_full, dada2_full_single],
+                           invocation_commands = [dada2_full],
                            initialization_commands = [dada2_init]
                            )
